@@ -407,7 +407,7 @@ body{
 	 }
 
 	// 设置智能合约地址
-	var contractAddress = "n1fkfKujusSNN4qzLU7QH8yrahWhnXSrGpk";
+	var contractAddress = "n1pEhFr5fQHeF1yCRvGcU7VZAeVXgcAkTFu";
 	 //将最好成绩上传到区块链
 	 function saveScore(){
 
@@ -444,11 +444,6 @@ body{
 	 	saveToNeb(userName,score_value)
     }
 
-	var nebulas = require("nebulas"),
-	Account = nebulas.Account,
-	neb = new nebulas.Neb();
-	neb.setRequest(new nebulas.HttpRequest("https://testnet.nebulas.io"));
-
     var NebPay = require("nebpay");     //https://github.com/nebulasio/nebPay
     var nebPay = new NebPay();
     var serialNumber
@@ -473,17 +468,35 @@ body{
     	console.log("response of push: " + JSON.stringify(resp))
     }
 
+    var nebulas = require("nebulas"),
+	Account = nebulas.Account,
+	neb = new nebulas.Neb();
+	neb.setRequest(new nebulas.HttpRequest("https://testnet.nebulas.io"));
     // 从星云链获取当前用户的最高记录
     function getScore(){
     	var userName = $("#userName").val();
     	if(userName){
+    		var from = Account.NewAccount().getAddressString();
     		var to = contractAddress;
     		var value = "0";
+    		var nonce = "0";
+    		var gas_price = "1000000";
+    		var gas_limit = "2000000";
     		var callFunction = "get";
-		        var callArgs = "[\"" + userName + "\"]"; //in the form of ["args"]
-		        nebPay.simulateCall(to, value, callFunction, callArgs, {    //使用nebpay的simulateCall接口去执行get查询, 模拟执行.不发送交易,不上链
-		            listener: update      //指定回调函数
-		        });
+		    var callArgs = "[\"" + userName + "\"]"; 
+		    var contract = {
+		    	"function":callFunction,
+		    	"args":callArgs
+		    }
+		    neb.api.call(from,to,value,nonce,gas_price,gas_limit,contract).then(function(resp){
+		    	update(resp)
+		    }).catch(function(err){
+		    	console.log("error:"+err.message)
+		    })
+		    // //in the form of ["args"]
+		    //     nebPay.simulateCall(to, value, callFunction, callArgs, {    //使用nebpay的simulateCall接口去执行get查询, 模拟执行.不发送交易,不上链
+		    //         listener: update      //指定回调函数
+		    //     });
 		}else{
 			alert("请先输入用户名！")
 		    updateHistoryTopScore("00:00");
@@ -500,8 +513,8 @@ body{
        			 }catch (err){
             	
         		}
-	       		if (!!result.key){     
-	       			 updateHistoryTopScore(result.value);
+	       		if (!!result.userName){     
+	       			 updateHistoryTopScore(result.score);
 	        	} else {       
 	        		updateHistoryTopScore("00:00");
 

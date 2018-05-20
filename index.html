@@ -66,7 +66,7 @@ body{
 <body>
 	<div class="content">
 
-		<h1>基于星云区块链的华容道游戏</h1>
+		<h1>基于星云链的华容道游戏</h1>
 		<div>
 			<span class="time-title">用时</span><span id="clockText" class="time-title"></span>
 			<span class="time-title">历史最短用时</span><span id="history_top" class="time-title">00:00</span>
@@ -408,7 +408,7 @@ body{
 	 }
 
 	// 设置智能合约地址
-	var contractAddress = "n1pEhFr5fQHeF1yCRvGcU7VZAeVXgcAkTFu";
+	var contractAddress = "n1vQVFw6zs9hGsEjDdjreTykwR3GQ6SJ7ch";
 	 //将最好成绩上传到区块链
 	 function saveScore(){
 
@@ -472,12 +472,13 @@ body{
     var nebulas = require("nebulas"),
 	Account = nebulas.Account,
 	neb = new nebulas.Neb();
-	neb.setRequest(new nebulas.HttpRequest("https://testnet.nebulas.io"));
+	neb.setRequest(new nebulas.HttpRequest("https://mainnet.nebulas.io/"));
     // 从星云链获取当前用户的最高记录
     function getScore(){
     	var userName = $("#userName").val();
     	if(userName){
     		var from = Account.NewAccount().getAddressString();
+    		alert(from)
     		var to = contractAddress;
     		var value = "0";
     		var nonce = "0";
@@ -489,15 +490,15 @@ body{
 		    	"function":callFunction,
 		    	"args":callArgs
 		    }
-		    neb.api.call(from,to,value,nonce,gas_price,gas_limit,contract).then(function(resp){
-		    	update(resp)
-		    }).catch(function(err){
-		    	console.log("error:"+err.message)
-		    })
+		    // neb.api.call(from,to,value,nonce,gas_price,gas_limit,contract).then(function(resp){
+		    // 	update(resp)
+		    // }).catch(function(err){
+		    // 	console.log("error:"+err.message)
+		    // })
 		    // //in the form of ["args"]
-		    //     nebPay.simulateCall(to, value, callFunction, callArgs, {    //使用nebpay的simulateCall接口去执行get查询, 模拟执行.不发送交易,不上链
-		    //         listener: update      //指定回调函数
-		    //     });
+		    nebPay.simulateCall(to, value, callFunction, callArgs, {    //使用nebpay的simulateCall接口去执行get查询, 模拟执行.不发送交易,不上链
+		            listener: update      //指定回调函数
+		        });
 		}else{
 			alert("请先输入用户名！")
 		    updateHistoryTopScore("00:00");

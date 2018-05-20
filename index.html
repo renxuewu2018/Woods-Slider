@@ -2,76 +2,89 @@
 <html>
 <head>
 	<title>Image puzzle</title>
-	<style type="text/css">
-	a{
-		color:#FF0000;
-		text-decoration:none;
-	}
-	a:hover{
-		text-decoration:underline;
-	}
-	body{
-		/*
-		You can remove these four options 
-		
-		
-		background-image:url('http://www.dhtmlgoodies.com/images/heading3.gif');
+	<link rel="stylesheet" href="css/style.css">
+</script><script src="js/jquery.min.js"></script>
+<style type="text/css">
+a{
+	color:#FF0000;
+	text-decoration:none;
+}
+a:hover{
+	text-decoration:underline;
+}
+body{
+	padding-top:10px;	
+	font-family: Trebuchet MS, Lucida Sans Unicode, Arial, sans-serif;
+	margin:10px;
+	padding-left:0px;
+	text-align:center;
+}
+#puzzle_container{
+	line-height:500px;
+	text-align:center;
+	vertical-align:center;
+	border:20px outset #FFFFFF;
+	position:relative;
+	color: #FFFFFF;
+	background-color: #707070;
 
-		*/
-		background-repeat:no-repeat;
-		padding-top:10px;	
-		font-family: Trebuchet MS, Lucida Sans Unicode, Arial, sans-serif;
-		
-		
-		height:80%;
-		width:80%;
-		margin:10px;
-		padding-left:0px;
-		text-align:left;
-	}
-	#puzzle_container{
-		line-height:500px;
-		text-align:center;
-		vertical-align:center;
-		border:10px outset #CCCCCC;
-		position:relative;
-		color: #FFFFFF;
-		background-color: #707070;
-		
-		width: 520px;	/* IE 5.x */
-		width/* */:/**/500px;	/* Other browsers */
-		width: /**/500px;	
-		
-		height: 520px;	/* IE 5.x */
-		height/* */:/**/500px;	/* Other browsers */
-		height: /**/500px;			
+	margin: 20px auto;
+	width: 520px;	/* IE 5.x */
+	width/* */:/**/500px;	/* Other browsers */
+	width: /**/500px;	
 
-	}
-	
-	#puzzle_container .square{
-		overflow:hidden;
-		border-left:1px solid #FFF;
-		border-top:1px solid #FFF;
-		position:absolute;
-	}
+	height: 520px;	/* IE 5.x */
+	height/* */:/**/500px;	/* Other browsers */
+	height: /**/500px;			
 
-	.activeImageIndicator{
-		border:1px solid #FF0000;
-		position:absolute;
-		z-index:10000;
-	}
-	.revealedImage{
-		position:absolute;
-		left:0px;
-		opacity:0;
-		filter:alpha(opacity=50);
-		top:0px;
-		z-index:50000;
-	}
-	</style>
-	
+}
+
+#puzzle_container .square{
+	overflow:hidden;
+	border-left:1px solid #FFF;
+	border-top:1px solid #FFF;
+	position:absolute;
+}
+
+.activeImageIndicator{
+	border:1px solid #FF0000;
+	position:absolute;
+	z-index:1;
+}
+.revealedImage{
+	position:absolute;
+	left:0px;
+	opacity:0;
+	filter:alpha(opacity=50);
+	top:0px;
+	z-index:50000;
+}
+</style>
+
+</head>
+<body>
+	<div class="content">
+
+		<h1>基于星云区块链的华容道游戏</h1>
+		<div>
+			<span class="time-title">用时</span><span id="clockText" class="time-title"></span>
+			<span class="time-title">历史最短用时</span><span id="history_top" class="time-title">00:00</span>
+		</div>
+		<div>
+			<h2>请输入您的用户名：</h2>
+			<input type="text" id="userName" placeholder="用户名" />
+		</div>
+		<span class="my-a" href="#" onclick="startGame();return false">开始</span>  
+		<span class="my-a" href="#" onclick="initPuzzle();return false">重置</span> 
 
 
+		<div id="puzzle_container">
+			Please wait - initializing script
+		</div>
+
+		<div id="messageDiv"></div>
+
+	</div>
 	<script src=js/nebPay.js></script>
 	<script src=js/nebulas.js></script>
 	<script type="text/javascript">
@@ -84,13 +97,13 @@
 	Alf Magne Kalleland
 	
 	*/
-		
-	// /var puzzleImages = ['images/image1.png','images/image2.png','images/image3.png','images/image4.png'];	// Array of images to choose from
-	var puzzleImages = ['images/image1.png'];	// Array of images to choose from
+
+
+	var puzzleImages = ['images/image.png'];	// Array of images to choose from
 
 	var rows = 3;
 	var cols = 3;
-		
+
 	var imageArray = new Array();
 	var imageInUse = false;
 	var puzzleContainer;
@@ -125,6 +138,8 @@
 			puzzleContainer = document.getElementById('puzzle_container');
 			getImageWidth();
 		}
+
+		resetClock()
 	}
 	
 	function getImageWidth()
@@ -136,8 +151,20 @@
 		}
 	}
 	
+	function startGame(){
+		var userName = $("#userName").val();
+		if(userName == null | userName.trim().length == 0){
+			alert("请先输入用户名！")
+		}else{
+			startClock()
+			scramble()
+			getScore()
+		}
+	}
+
 	function scramble()
 	{
+		
 		gameInProgress = true;
 		var currentRow = cols-1;
 		var currentCol = rows-1;
@@ -194,6 +221,7 @@
 	
 	function gameFinished()
 	{
+		
 		var string = "";
 
 		var squareWidth = colWidth + 1;
@@ -211,24 +239,27 @@
 			}else{
 				correctSquares++;
 			}
-				
+
 			squareCounter++;	
 		}	
 		
 		if(correctSquares == ((cols * rows) -1)){
-			document.getElementById('messageDiv').innerHTML = '<h2>Fantastic! You did it !!</h2>';
+			document.getElementById('messageDiv').innerHTML = '<h2>恭喜您，成功了!!</h2>';
 			gameInProgress = false;
 			revealImage();
 
-			
+			//在这里添加保存区块链的数据
+			stopClock()
+			gameSuccessful()
 		}else{
 			document.getElementById('messageDiv').innerHTML = 'Currently, you have ' + correctSquares + ' out of ' + ((cols * rows) -1) + ' pieces placed correctly';
+
 		}
 
-
+		
 		
 	}
-	
+
 	var currentOpacity = 0;
 	function revealImage()
 	{
@@ -240,12 +271,12 @@
 			obj.style.filter = 'alpha(opacity='+currentOpacity+')';
 		}else{
 			obj.style.opacity = currentOpacity/100;
+
 		}
-		
-		if(currentOpacity<100)setTimeout('revealImage()',10);
+		if(currentOpacity<100){
+			setTimeout('revealImage()',3)
+		};
 
-
-		
 	}
 	function displayActiveImage()
 	{
@@ -255,7 +286,7 @@
 			activeImageIndicator.className = 'activeImageIndicator';
 			puzzleContainer.appendChild(activeImageIndicator);
 			activeImageIndicator.onclick = moveImage;
-			
+
 		}
 		activeImageIndicator.style.display='block';
 		activeImageIndicator.style.left = this.offsetLeft +  'px';
@@ -265,20 +296,20 @@
 		activeImageIndicator.innerHTML = '<span></span>';
 		activeSquare = this;
 	}
-	
+
 	function moveImage(e,fromShuffleFunction)
 	{
 		if(!activeSquare)return;
 		if(!gameInProgress && !fromShuffleFunction){
-			alert('You have to shuffle the cards first');
+			alert("您需要先打乱，再开始玩！");
 			return;
 		}
 		var currentLeft = activeSquare.style.left.replace('px','') /1;
 		var currentTop = activeSquare.style.top.replace('px','') /1;
-		
+
 		var diffLeft = Math.round((currentLeft - emptySquare_x) / colWidth);
 		var diffTop = Math.round((currentTop - emptySquare_y) / rowHeight);	
-		
+
 		if(((diffLeft==-1 || diffLeft==1) && diffTop==0) || ((diffTop==-1 || diffTop==1) && diffLeft==0)){	// Moving right
 			activeSquare.style.left = emptySquare_x + 'px';
 			activeSquare.style.top = emptySquare_y + 'px';
@@ -315,7 +346,7 @@
 		img.src = imageInUse.src;
 		revealedImage.appendChild(img);
 		puzzleContainer.appendChild(revealedImage);
-			
+
 		colWidth = Math.round(imageInUse.width / cols)-1;
 		rowHeight = Math.round(imageInUse.height / rows)-1;
 
@@ -327,7 +358,7 @@
 			puzzleContainer.style.height = rowHeight * rows + (rows * 1) + 20 + 'px';			
 			
 		}
-				
+
 		if(!revealedImage){
 			revealedImage = document.createElement('DIV');
 			revealedImage.style.display='none';	
@@ -367,23 +398,67 @@
 	window.onload = initPuzzle;
 
 
+	/*********************************************************
+	 *  与智能合约交互保存记录到星云链
+	 **********************************************************/
+	 function gameSuccessful(){
+	 	alert("将记录上传到星云链！");
+	 	saveScore();
+	 }
 
+	// 设置智能合约地址
 	var contractAddress = "n1fkfKujusSNN4qzLU7QH8yrahWhnXSrGpk";
+	 //将最好成绩上传到区块链
+	 function saveScore(){
+
+	 	var current_score = $("#clockText").text();
+	 	var history_top_score = $("#history_top").text();
+
+	 	var current_score_value =0;
+
+	 	var history_top_score_value =0 ;
+
+	 	if(current_score){
+	 		var temp = current_score.split(":")
+	 		current_score_value = parseInt(temp[0])*60 + parseInt(temp[1]);
+	 	}
+
+	 	if(history_top_score){
+	 		var temp = history_top_score.split(":")
+	 		history_top_score_value = parseInt(temp[0])*60 + parseInt(temp[1]);
+	 	}
+
+
+	 	var score_value = "";
+	 	if(history_top_score_value == 0){
+	 		score_value = current_score;
+	 	}else{
+		 	if(history_top_score_value<=current_score_value){
+		 		score_value = history_top_score;
+		 	}else{
+		 		score_value = current_score;
+		 	}
+		}
+	 	var userName = $("#userName").val();
+
+	 	saveToNeb(userName,score_value)
+    }
 
 	var nebulas = require("nebulas"),
-        Account = nebulas.Account,
-        neb = new nebulas.Neb();
-    neb.setRequest(new nebulas.HttpRequest("https://testnet.nebulas.io"));
-
+	Account = nebulas.Account,
+	neb = new nebulas.Neb();
+	neb.setRequest(new nebulas.HttpRequest("https://testnet.nebulas.io"));
 
     var NebPay = require("nebpay");     //https://github.com/nebulasio/nebPay
     var nebPay = new NebPay();
     var serialNumber
-    function save(){
+
+    function saveToNeb(userName,score){
+
     	var to = contractAddress;
-        var value = "0";
-        var callFunction = "save"
-        var callArgs = "[\"seek\",\"890\"]"
+	 	var value = "0";
+	 	var callFunction = "save"
+        var callArgs = "[\"" + userName+ "\",\"" + score + "\"]"
 
         serialNumber = nebPay.call(to, value, callFunction, callArgs, {    //使用nebpay的call接口去调用合约,
             listener: cbPush        //设置listener, 处理交易返回信息
@@ -391,59 +466,81 @@
 
         intervalQuery = setInterval(function () {
            // funcIntervalQuery();
-        }, 5000);
+       }, 5000);
     }
- 
- 	// var intervalQuery
 
-  //   function funcIntervalQuery() {
-  //       nebPay.queryPayInfo(serialNumber)   //search transaction result from server (result upload to server by app)
-  //           .then(function (resp) {
-  //               console.log("tx result: " + resp)   //resp is a JSON string
-  //               var respObject = JSON.parse(resp)
-  //               if(respObject.code === 0){
-  //                   alert(`set ${$("#search_value").val()} succeed!`)
-  //                   clearInterval(intervalQuery)
-  //               }
-  //           })
-  //           .catch(function (err) {
-  //               console.log(err);
-  //           });
-  //   }
     function cbPush(resp) {
-        console.log("response of push: " + JSON.stringify(resp))
+    	console.log("response of push: " + JSON.stringify(resp))
     }
-	
-	</script>
-</head>
-<body>
-<h1>星云区块链游戏</h1>
-<div>
-	<span>用时：</span>
-	<span>历史最短用时：</span>
-</div>
-<div>
-	<span>请输入您的用户名：</span>
-	<input tytp="text" id="userName"/>
-</div>
-<a href="#" onclick="scramble();return false">打乱</a> | 
-<a href="#" onclick="initPuzzle();return false">重新开始</a> 
-<!-- 
-<a href="#" onclick="initPuzzle();return false">换图片</a> | 
-<form style="display:inline;">
 
- 列/行: <input type="text" value="4" onblur="var no = this.value.replace(/[^\d]/g,'');if(no/1<3){ this.value = '3';no=3; };cols=no" maxlength="1" size="2"> x 
-<input type="text" value="3" onblur="var no = this.value.replace(/[^\d]/g,'');if(no/1<2){ this.value = '2';no=2; };rows=no" maxlength="1" size="2"> 
+    // 从星云链获取当前用户的最高记录
+    function getScore(){
+    	var userName = $("#userName").val();
+    	if(userName){
+    		var to = contractAddress;
+    		var value = "0";
+    		var callFunction = "get";
+		        var callArgs = "[\"" + userName + "\"]"; //in the form of ["args"]
+		        nebPay.simulateCall(to, value, callFunction, callArgs, {    //使用nebpay的simulateCall接口去执行get查询, 模拟执行.不发送交易,不上链
+		            listener: update      //指定回调函数
+		        });
+		}else{
+			alert("请先输入用户名！")
+		    updateHistoryTopScore("00:00");
+		}
+	}
+		function update(resp) {
+			var result = resp.result
+			console.log("return of rpc call: " + JSON.stringify(result))
+			if (result === 'null'){
+				updateHistoryTopScore("00:00");
+   			}else{
+       			 try{
+        			result = JSON.parse(result)
+       			 }catch (err){
+            	
+        		}
+	       		if (!!result.key){     
+	       			 updateHistoryTopScore(result.value);
+	        	} else {       
+	        		updateHistoryTopScore("00:00");
 
-</form>
--->
-<div id="puzzle_container">
-Please wait - initializing script
-</div>
+	    		}
 
-<div id="messageDiv"></div>
-<p><i>打乱，然后移动图片</i></p>
-<button onclick="save();return false">保存</button>
+			}
+	}
 
+	function updateHistoryTopScore(score){
+		$("#history_top").text(score);
+	}
+	/*********************************************************
+	 *  计时器
+	 **********************************************************/
+	var n= 0, timer=null;
+	var clock = document.getElementById("clockText");
+	// 开始计时
+	function startClock(){
+		clearInterval(timer);
+		timer=setInterval(function () {
+			n++;
+			var m=parseInt(n/60);
+			var s=parseInt(n%60);
+			clock.innerHTML=toDub(m)+":"+toDub(s);
+		},1000/60);
+	}
+	// 重置
+	function resetClock(){
+		clock.innerHTML="00:00";
+		clearInterval(timer);
+		n=0;
+	}
+	function stopClock(){
+		clearInterval(timer);
+	}
+	// 补零
+	function toDub(n){
+		return n<10?"0"+n:""+n;
+	}
+</script>
 </body>
 </html>

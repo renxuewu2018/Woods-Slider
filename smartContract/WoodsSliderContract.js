@@ -49,19 +49,13 @@ WoodsSliderContract.prototype = {
         var from = Blockchain.transaction.from;
         var woodsSliderItem = this.userScore.get(userName);
         if (woodsSliderItem){
-            woodsSliderItem.address = from;
-            woodsSliderItem.userName = userName;
-            woodsSliderItem.score = score;
-            //throw new Error("用户名已注册，请重新输入！");
+            throw new Error("用户名已注册，请重新输入！");
         }else{
             woodsSliderItem = new WoodsSliderItem();
             woodsSliderItem.address = from;
             woodsSliderItem.userName = userName;
             woodsSliderItem.score = score; 
         }
-
- 
-
         this.userScore.put(userName, woodsSliderItem);
     },
 
